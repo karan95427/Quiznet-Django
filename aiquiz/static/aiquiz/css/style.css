@@ -529,7 +529,7 @@ body::before {
 
 .logout-btn:hover {
     transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(123, 31, 162, 0.4);
+    box-shadow: 0 4px 12px rgba(2, 225, 255, 0.971);
 }
 
 .logout-btn img {
