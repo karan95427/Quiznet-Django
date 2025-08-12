@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="homepage-background fade-bg">
+    <div class="dashboard-container">
+        <h1 class="dashboard-title"> <img src="{% static 'aiquiz/images/history-icon.png' %}" alt="History"
+                style="width: 50px; height: 50px; margin-right: 8px; vertical-align: middle;">Quiz History</h1>
+        <div class="dashboard-card">
+            {% if all_quizzes %}
+            <ul>
+                {% for quiz_item in all_quizzes %}
+                <li class="question-box" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span><strong>{{ forloop.counter }}.</strong> Quiz on <strong>{{ quiz_item.topic }}</strong>
+                        <small style="color: #ccc;">({{ quiz_item.created_at|date:"M d, Y" }})</small></span>
+
+                    <a href="{% url 'aiquiz:quiz' %}?quiz_id={{ quiz_item.id }}" class="dashboard-btn"
+                        style="padding: 0.4rem 1rem; font-size: 0.9rem;">
+                        View Quiz
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="text-center">
+                No quizzes generated yet. Go to the
+                Homepage to create one!
+            </p>
+            {% endif %}
+        </div>
+
+        <div
+            style="text-align: center; margin-top: 2rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <a href="{% url 'aiquiz:quiz' %}">
+                <button class="dashboard-btn"><img src="{% static 'aiquiz/images/home-icon.png'%}" alt="Home"
+                        style="width: 27px; height: 27px; margin-right: 8px; vertical-align: middle; margin-top: 3px;">
+                    Homepage</button>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

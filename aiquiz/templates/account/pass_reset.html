@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Password Changed{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'aiquiz/css/auth.css' %}">
+{% endblock %}
+
+{% block body_class %}auth-body{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <h2>Password Changed Successfully</h2>
+    <p>Your password has been updated. You can now log in with your new password.</p>
+    <div class="auth-link">
+        <a href="{% url 'account_login' %}">Log in Now</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Set New Password{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'aiquiz/css/auth.css' %}">
+{% endblock %}
+
+{% block body_class %}auth-body{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <h2>Set a New Password</h2>
+
+    <!-- Django checks if the link is valid. If so, it shows the form. -->
+    {% if validlink %}
+    <p>Please enter your new password twice so we can verify you typed it in correctly.</p>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="id_new_password1">New password:</label>
+            {{ form.new_password1 }}
+        </div>
+        <div class="form-group">
+            <label for="id_new_password2">Confirm password:</label>
+            {{ form.new_password2 }}
+        </div>
+        <button type="submit" class="btn-primary">Change my password</button>
+    </form>
+    {% else %}
+    <!-- If the link is invalid or expired, show an error. -->
+    <p>
+        The password reset link was invalid, possibly because it has already been used.
+        Please request a new password reset.
+    </p>
+    <div class="auth-link">
+        <a href="{% url 'pass_reset_form' %}">Request a new link</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

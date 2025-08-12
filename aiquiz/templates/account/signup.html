@@ -1,0 +1,157 @@
+{% load static %}
+{% load socialaccount %}
+{% load i18n %}
+{% load account %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Sign Up</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: url("{% static 'aiquiz/images/3334896.jpg' %}") no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 130vh;
+            margin: 0;
+        }
+
+        .login-box {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem 3rem;
+            border-radius: 16px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 600px;
+            animation: fadeSlideIn 0.6s ease-out forwards;
+            opacity: 0;
+            backdrop-filter: blur(4px);
+        }
+
+        .login-box h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-weight: bold;
+        }
+
+        form label {
+            display: block;
+            margin-top: 1rem;
+            font-weight: 500;
+        }
+
+        form input {
+            width: 100%;
+            padding: 0.5rem;
+            margin-top: 0.3rem;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            margin-top: 1.5rem;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #218838;
+        }
+
+        .google-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 0.75rem;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            color: #333;
+            margin-top: 1rem;
+            font-size: 1rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .google-btn:hover {
+            background-color: #3367D6;
+            color: #fff;
+        }
+
+        .google-btn img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .signup-link {
+            margin-top: 1.5rem;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+
+        .signup-link a {
+            color: #4285F4;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+
+        @keyframes fadeSlideIn {
+            0% {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-box">
+        <h2>Create an Account</h2>
+
+        <!-- Username/Password Sign Up Form -->
+        <form method="POST" action="{% url 'account_signup' %}">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn">Sign Up</button>
+        </form>
+
+        <!-- Google Sign Up -->
+        <a href="{% provider_login_url 'google' %}" class="google-btn">
+            <img src="{% static 'aiquiz/images/google-icon.png' %}" alt="Google">
+            Sign up with Google
+        </a>
+
+        <!-- Login Link -->
+        <div class="signup-link">
+            <p>Already have an account? <a href="{% url 'account_login' %}">Log in</a></p>
+        </div>
+    </div>
+    <script src="{% static 'aiquiz/scripts/main.js' %}"></script>
+</body>
+
+</html>

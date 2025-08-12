@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="homepage-background">
+    <div class="dashboard-container">
+        <h1 class="dashboard-title floating">
+            <img src="{% static 'aiquiz/images/ai-logo.png'%}" alt="Logo"
+                style="height: 80px; vertical-align: middle; margin-right: 10px;">Quiz Builder
+        </h1>
+
+        {% if show_history_button %}
+        <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem;">
+            <div class="dashboard-card link-card" style="flex: 1 1 250px; text-align: center;">
+                <a href="{% url 'aiquiz:quiz_history' %}" class="dashboard-link"
+                    style="display: flex; align-items: center; justify-content: center; width: 100%;">
+                    <img src="{% static 'aiquiz/images/history-icon.png' %}" alt="History"
+                        style="width: 20px; height: 20px; margin-right: 8px; vertical-align: middle;">
+                    History
+                </a>
+            </div>
+            <div class="dashboard-card link-card" style="flex: 1 1 250px; text-align: center;">
+                <a href="{% url 'aiquiz:score_chart' %}" class="dashboard-link"
+                    style="display: flex; align-items: center; justify-content: center; width: 100%;">
+                    <img src="{% static 'aiquiz/images/score-chart.png'%}" alt="score logo"
+                        style="width: 20px; height: 20px; margin-right: 8px; vertical-align: middle;">
+                    Score Analytics
+                </a>
+            </div>
+        </div>
+        {% endif %}
+
+
+        {% comment %} ALWAYS SHOW PERSONALIZED SUGGESTION FOR NON-FIRST-TIME USERS {% endcomment %}
+        {% if next_topic and not first_time_user %}
+        <div class="dashboard-card suggestion-card"
+            style="margin-bottom: 1.5rem; background: linear-gradient(135deg, #2d2d44, #1e1e2f); padding: 1.5rem; border-left: 5px solid #7b1fa2; border-radius: 12px; box-shadow: 0 4px 15px rgba(123, 31, 162, 0.2);">
+            <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                <div
+                    style="background: linear-gradient(135deg, #7b1fa2, #bb86fc); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+                    <span style="font-size: 1.2rem;">💡</span>
+                </div>
+                <h4 style="color: #bb86fc; margin: 0; font-size: 1.1rem; font-weight: 600;">Personalized Recommendation
+                </h4>
+            </div>
+            <p style="color: #e0e0e0; margin-bottom: 1rem; line-height: 1.5;">
+                Based on your performance history, I recommend focusing on
+                <strong style="color: #bb86fc;">{{ next_topic }}</strong> at
+                <strong style="color: #bb86fc;">{{ next_difficulty|title }}</strong> difficulty
+                to strengthen your weak areas.
+            </p>
+            <form method="POST" style="margin: 0;">
+                {% csrf_token %}
+                <input type="hidden" name="topic" value="{{ next_topic }}">
+                <button class="dashboard-btn suggested-btn" type="submit"
+                    style="background: linear-gradient(135deg, #7b1fa2, #bb86fc); border: none; padding: 0.6rem 1.5rem; border-radius: 8px; font-weight: 600; transition: all 0.3s ease;">
+                    📚 Take Recommended Quiz
+                </button>
+            </form>
+        </div>
+        {% endif %}
+
+        {% if first_time_user %}
+        <div class="dashboard-card"
+            style="background-color: #2d2d44; padding: 1rem; margin-bottom: 1rem; border-left: 5px solid #4cafef;">
+            <h3 style="color: #4cafef; margin-bottom: 0.5rem;">👋 Welcome to Quiz Builder!</h3>
+            <p style="color: #ccc;">
+                This looks like your first quiz. Enter a topic below to get started, and from your second quiz onward,
+                I'll adapt the questions based on your strengths and weaknesses.
+            </p>
+        </div>
+        {% endif %}
+
+        {% if not quiz and not results %}
+        <div class="dashboard-card input-card">
+            <p class="lead">Enter a topic to generate a new quiz and test your knowledge!</p>
+            Start Quiz
+            <form method="POST">
+                {% csrf_token %}
+                <input class="form-input" type="text" name="topic" placeholder="e.g., Ancient Rome" required />
+                <select name="difficulty" class="dashboard-btn" required>
+                    <option value="easy">Easy</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="hard">Hard</option>
+                </select>
+                <button class="dashboard-btn" type="submit">Start Quiz</button>
+            </form>
+        </div>
+        {% endif %}
+
+        {% if quiz and not show_results_only %}
+        <div class="dashboard-card input-card">
+            <h2 class="quiz-heading">Quiz on: {{ quiz.topic }}</h2>
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="quiz_id" value="{{ quiz.id }}">
+
+                {% for question in quiz.questions.all %}
+                <div class="question-box" style="color: whitesmoke;">
+                    <p class="question-text">{{ forloop.counter }}. {{ question.question_text }}</p>
+                    <p class="question-type-label">Type: {{ question.question_type }}</p>
+
+                    {% if question.question_type == "MCQ" or question.question_type == "TF" %}
+                    {% for option in question.options %}
+                    <div class="option-box" style="color: whitesmoke;">
+                        <input type="radio" name="question_{{ question.id }}" value="{{ option }}"
+                            id="option_{{ question.id }}_{{ forloop.counter }}" required />
+                        <label for="option_{{ question.id }}_{{ forloop.counter }}">{{ option }}</label>
+                    </div>
+                    {% endfor %}
+                    {% elif question.question_type == "FIB" %}
+                    <input type="text" name="question_{{ question.id }}" class="form-input" required
+                        placeholder="Your answer..." />
+                    {% else %}
+                    <textarea name="question_{{ question.id }}" class="form-input" rows="4" required
+                        placeholder="Write your answer..."></textarea>
+                    {% endif %}
+                </div>
+                {% endfor %}
+
+                <button type="submit" class="dashboard-btn">Submit & See Results</button>
+            </form>
+        </div>
+        {% endif %}
+
+        {% if results %}
+        <div class="dashboard-card input-card">
+            <h2 class="quiz-heading">
+                {% if show_results_only %}Your Attempt{% else %}Quiz Results{% endif %}
+            </h2>
+            <h3 class="score-heading">Your Score: {{ results.score }} / {{ results.total }}</h3>
+
+            {% for item in results.details %}
+            <div class="result-box {% if item.is_correct %}correct{% else %}incorrect{% endif %}">
+                <p><strong>Q: {{ item.question }}</strong></p>
+                <p>Your Answer: {{ item.user_answer }}</p>
+                {% if not item.is_correct %}
+                <p class="correct-answer">Correct Answer: {{ item.correct_answer }}</p>
+                {% endif %}
+                {% if item.explanation %}
+                <p><em>{{ item.explanation }}</em></p>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <div style="text-align: center; margin-top: 2rem;">
+                <a href="{% url 'aiquiz:quiz' %}">
+                    <button class="dashboard-btn">Create a New Quiz</button>
+                </a>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if error %}
+        <div class="error-box">
+            <p>{{ error }}</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .suggestion-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(123, 31, 162, 0.3) !important;
+        transition: all 0.3s ease;
+    }
+
+    .suggested-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(123, 31, 162, 0.4);
+        background: linear-gradient(135deg, #8e24aa, #ce93d8) !important;
+    }
+</style>
+{% endblock %}

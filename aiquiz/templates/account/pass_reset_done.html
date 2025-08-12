@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Email Sent{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'aiquiz/css/auth.css' %}">
+{% endblock %}
+
+{% block body_class %}auth-body{% endblock %}
+
+{% block content %}
+<div class="container-form">
+    <div class="auth-container">
+        <h2>Check Your Inbox</h2>
+        <p>
+            We've sent a password reset link to the email address you provided. Please check your email and follow the
+            instructions to reset your password.
+        </p>
+        <div class="auth-link">
+            <a href="{% url 'account_login' %}">Return to Login</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

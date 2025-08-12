@@ -1,0 +1,8 @@
+.env
+client_secret_*.json
+db.sqlite3
+__pycache__/
+*.pyc
+/staticfiles/
+.vscode/
+github.txt

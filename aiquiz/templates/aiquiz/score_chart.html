@@ -1,0 +1,635 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="homepage-background" style="display: none;" id="analyticsPage">
+    <div class="analytics-container">
+        <!-- Header -->
+        <div class="analytics-header">
+            <div class="header-content">
+                <h1 class="analytics-title">
+                    <img src="{% static 'aiquiz/images/score-chart.png' %}" alt="Analytics" class="title-icon"
+                        style="margin-bottom: 1rem;">
+                    Score Analytics
+                </h1>
+                <p class="analytics-subtitle">Here's an overview of your quiz performance</p>
+            </div>
+        </div>
+
+        {% if has_data %}
+        <!-- Metrics Cards -->
+        <div class="metrics-grid">
+            <div class="metric-card orange">
+                <div class="metric-icon">
+                    <div class="icon-bg orange-bg">
+                        <span>📚</span>
+                    </div>
+                </div>
+                <div class="metric-content">
+                    <div class="metric-trend">
+                        <span class="trend-icon">↗️</span>
+                        <span class="trend-text">12.5%</span>
+                        <small>This week</small>
+                    </div>
+                    <div class="metric-info">
+                        <p class="metric-label">Total Quizzes</p>
+                        <h2 class="metric-value">{{ statistics.total_quizzes }}</h2>
+                    </div>
+                </div>
+                <div class="metric-chart">
+                    <svg class="mini-chart" viewBox="0 0 60 30">
+                        <path d="M5,25 Q15,15 25,20 T45,10 T55,5" stroke="#ff9500" stroke-width="2" fill="none" />
+                        <circle cx="55" cy="5" r="2" fill="#ff9500" />
+                    </svg>
+                </div>
+            </div>
+
+            <div class="metric-card blue">
+                <div class="metric-icon">
+                    <div class="icon-bg blue-bg">
+                        <span>🎯</span>
+                    </div>
+                </div>
+                <div class="metric-content">
+                    <div class="metric-trend">
+                        <span class="trend-icon">↘️</span>
+                        <span class="trend-text">7.5%</span>
+                        <small>This week</small>
+                    </div>
+                    <div class="metric-info">
+                        <p class="metric-label">Total Score</p>
+                        <h2 class="metric-value">{{ statistics.total_score }}</h2>
+                    </div>
+                </div>
+                <div class="metric-chart">
+                    <svg class="mini-chart" viewBox="0 0 60 30">
+                        <path d="M5,15 Q15,10 25,15 T45,20 T55,25" stroke="#4285f4" stroke-width="2" fill="none" />
+                        <circle cx="55" cy="25" r="2" fill="#4285f4" />
+                    </svg>
+                </div>
+            </div>
+
+            <div class="metric-card green">
+                <div class="metric-icon">
+                    <div class="icon-bg green-bg">
+                        <span>📊</span>
+                    </div>
+                </div>
+                <div class="metric-content">
+                    <div class="metric-trend">
+                        <span class="trend-icon">↗️</span>
+                        <span class="trend-text">2.4%</span>
+                        <small>This week</small>
+                    </div>
+                    <div class="metric-info">
+                        <p class="metric-label">Average Performance</p>
+                        <h2 class="metric-value">{{ statistics.overall_percentage }}%</h2>
+                    </div>
+                </div>
+                <div class="metric-chart">
+                    <svg class="mini-chart" viewBox="0 0 60 30">
+                        <path d="M5,20 Q15,25 25,15 T45,8 T55,5" stroke="#0f9d58" stroke-width="2" fill="none" />
+                        <circle cx="55" cy="5" r="2" fill="#0f9d58" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-grid">
+            <!-- Main Chart -->
+            <div class="chart-card main-chart">
+                <div class="chart-header">
+                    <h3>Quiz Performance Over Time</h3>
+                </div>
+                <div class="chart-content">
+                    <canvas id="scoreChart"></canvas>
+                </div>
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <span class="legend-color existing"></span>
+                        <span>Your Scores</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color new"></span>
+                        <span>Target Score</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Insights -->
+            <div class="chart-card insights-card">
+                <div class="chart-header">
+                    <h3>Performance by Topic</h3>
+                </div>
+                <div class="insights-content">
+                    <div class="insight-item">
+                        <div class="insight-flag">🇺🇸</div>
+                        <div class="insight-info">
+                            <span class="insight-topic">Best Performance</span>
+                            <span class="insight-score" id="bestScore">Loading...</span>
+                        </div>
+                    </div>
+
+                    <div class="insight-item">
+                        <div class="insight-flag">📈</div>
+                        <div class="insight-info">
+                            <span class="insight-topic">Recent Trend</span>
+                            <span class="insight-score" id="trendScore">Loading...</span>
+                        </div>
+                    </div>
+
+                    <div class="insight-item">
+                        <div class="insight-flag">🎯</div>
+                        <div class="insight-info">
+                            <span class="insight-topic">Improvement Area</span>
+                            <span class="insight-score" id="improvementScore">Loading...</span>
+                        </div>
+                    </div>
+
+                    <div class="insight-item">
+                        <div class="insight-flag">⭐</div>
+                        <div class="insight-info">
+                            <span class="insight-topic">Consistency</span>
+                            <span class="insight-score" id="consistencyScore">Loading...</span>
+                        </div>
+                    </div>
+
+                    <div class="insight-item">
+                        <div class="insight-flag">💡</div>
+                        <div class="insight-info">
+                            <span class="insight-topic">Learning Progress</span>
+                            <span class="insight-score" id="learningScore">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% else %}
+        <!-- No Data State -->
+        <div class="no-data-state">
+            <div class="no-data-icon">📊</div>
+            <h3>No Analytics Data Available</h3>
+            <p>Start taking quizzes to see your performance analytics and insights.</p>
+            <a href="{% url 'aiquiz:quiz' %}" class="cta-button">Create Your First Quiz</a>
+        </div>
+        {% endif %}
+
+        <!-- Navigation -->
+        <div class="bottom-nav">
+            <a href="{% url 'aiquiz:quiz' %}" class="nav-btn primary">
+                <img src="{% static 'aiquiz/images/home-icon.png'%}" alt="Home"
+                    style="width: 30px; height: 30px; margin-right: 8px; vertical-align: middle; margin-bottom: 7px;">Homepage
+            </a>
+            <a href="{% url 'aiquiz:quiz_history' %}" class="nav-btn secondary">
+                <img src="{% static 'aiquiz/images/history-icon.png' %}" alt="History"
+                    style="width: 30px; height: 30px; margin-right: 8px; vertical-align: middle;"> Quiz History
+            </a>
+        </div>
+    </div>
+</div>
+
+{% if has_data %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const chartData = JSON.parse('{{ chart_data|escapejs }}');
+
+        const labels = chartData.map(function (item) {
+            const date = new Date(item.date);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        });
+        const scores = chartData.map(function (item) {
+            return item.score;
+        });
+        const targetScores = scores.map(function () {
+            return 5;
+        });
+
+        const ctx = document.getElementById('scoreChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Your Scores',
+                        data: scores,
+                        backgroundColor: '#22c55e',
+                        borderRadius: 4,
+                        maxBarThickness: 20,
+                    },
+                    {
+                        label: 'Target Score',
+                        data: targetScores,
+                        backgroundColor: '#3b82f6',
+                        borderRadius: 4,
+                        maxBarThickness: 20,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#9ca3af'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        max: 6,
+                        grid: {
+                            color: '#374151',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#9ca3af',
+                            stepSize: 1
+                        }
+                    }
+                },
+                elements: {
+                    bar: {
+                        borderWidth: 0
+                    }
+                }
+            }
+        });
+
+        // Update insights with actual data
+        const maxScore = Math.max.apply(Math, scores);
+        const minScore = Math.min.apply(Math, scores);
+        const avgScore = (scores.reduce(function (a, b) { return a + b; }, 0) / scores.length).toFixed(1);
+        const recentScores = scores.slice(-3);
+        const recentAvg = (recentScores.reduce(function (a, b) { return a + b; }, 0) / recentScores.length).toFixed(1);
+
+        document.getElementById('bestScore').textContent = `${maxScore}/5`;
+        document.getElementById('trendScore').textContent = `${recentAvg}/5`;
+        document.getElementById('improvementScore').textContent = `${minScore}/5`;
+        document.getElementById('consistencyScore').textContent = `${avgScore}/5`;
+        document.getElementById('learningScore').textContent = `${scores.length} taken`;
+        document.getElementById("analyticsPage").style.display = "block";
+    });
+</script>
+{% endif %}
+
+<style>
+    .analytics-container {
+        max-width: 1300px;
+        margin: 0 auto;
+        padding: 2rem;
+        background: rgba(35, 43, 63, 0.95);
+        border-radius: 16px;
+        backdrop-filter: blur(10px);
+    }
+
+    .analytics-header {
+        margin-bottom: 2rem;
+    }
+
+    .header-content h1.analytics-title {
+        display: flex;
+        align-items: center;
+        font-size: 2rem;
+        font-weight: 700;
+        color: #f8fafc;
+        margin-bottom: 0.5rem;
+    }
+
+    .title-icon {
+        width: 40px;
+        height: 40px;
+        margin-right: 12px;
+    }
+
+    .analytics-subtitle {
+        color: #94a3b8;
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .metric-card {
+        background: #1e293b;
+        border-radius: 12px;
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid #334155;
+    }
+
+    .metric-icon {
+        margin-right: 1rem;
+    }
+
+    .icon-bg {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    .orange-bg {
+        background: #ff9500;
+    }
+
+    .blue-bg {
+        background: #4285f4;
+    }
+
+    .green-bg {
+        background: #0f9d58;
+    }
+
+    .metric-content {
+        flex: 1;
+    }
+
+    .metric-trend {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .trend-icon {
+        font-size: 0.875rem;
+    }
+
+    .trend-text {
+        color: #22c55e;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+
+    .metric-trend small {
+        color: #64748b;
+        font-size: 0.75rem;
+    }
+
+    .metric-label {
+        color: #94a3b8;
+        font-size: 0.875rem;
+        margin: 0 0 0.25rem 0;
+    }
+
+    .metric-value {
+        color: #f8fafc;
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .metric-chart {
+        width: 60px;
+        height: 30px;
+    }
+
+    .mini-chart {
+        width: 100%;
+        height: 100%;
+    }
+
+    .charts-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .chart-card {
+        background: #1e293b;
+        border-radius: 12px;
+        padding: 1.5rem;
+        border: 1px solid #334155;
+    }
+
+    .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .chart-header h3 {
+        color: #f8fafc;
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .chart-select {
+        background: #0f172a;
+        border: 1px solid #334155;
+        color: #f8fafc;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-size: 0.875rem;
+    }
+
+    .chart-content {
+        height: 300px;
+        margin-bottom: 1rem;
+    }
+
+    .chart-legend {
+        display: flex;
+        gap: 1.5rem;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        color: #94a3b8;
+    }
+
+    .legend-color {
+        width: 12px;
+        height: 12px;
+        border-radius: 2px;
+    }
+
+    .legend-color.existing {
+        background: #22c55e;
+    }
+
+    .legend-color.new {
+        background: #3b82f6;
+    }
+
+    .insights-content {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .insight-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #334155;
+    }
+
+    .insight-item:last-child {
+        border-bottom: none;
+    }
+
+    .insight-flag {
+        font-size: 1.25rem;
+        margin-right: 0.75rem;
+    }
+
+    .insight-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .insight-topic {
+        color: #f8fafc;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .insight-score {
+        color: #64748b;
+        font-size: 0.75rem;
+    }
+
+    .insight-change {
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .insight-change.positive {
+        color: #22c55e;
+    }
+
+    .insight-change.negative {
+        color: #ef4444;
+    }
+
+    .no-data-state {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+
+    .no-data-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    .no-data-state h3 {
+        color: #f8fafc;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .no-data-state p {
+        color: #94a3b8;
+        margin-bottom: 2rem;
+    }
+
+    .cta-button {
+        background: linear-gradient(135deg, #7b1fa2, #512da8);
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+
+    .cta-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(123, 31, 162, 0.3);
+    }
+
+    .bottom-nav {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+
+    .nav-btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .nav-btn.primary {
+        background: #334155;
+        color: #f8fafc;
+        border: 1px solid #475569;
+    }
+
+    .nav-btn.secondary {
+        background: #334155;
+        color: #f8fafc;
+        border: 1px solid #475569;
+    }
+
+    .nav-btn:hover {
+        transform: translateY(-2px);
+    }
+
+    @media (max-width: 1024px) {
+        .charts-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .metrics-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .analytics-container {
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .metric-card {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .metric-chart {
+            margin-top: 1rem;
+        }
+
+        .bottom-nav {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
