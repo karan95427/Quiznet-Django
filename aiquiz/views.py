@@ -277,6 +277,12 @@ def score_chart_view(request):
     # Calculate overall percentage (assuming 5 questions per quiz)
     max_possible_score = total_quizzes * 5
     overall_percentage = (total_score / max_possible_score * 100) if max_possible_score > 0 else 0
+    
+    if not chart_data:
+        chart_data = []
+        total_quizzes = 0
+        total_score = 0
+        overall_percentage = 0
 
     context = {
         'statistics': {
@@ -285,7 +291,7 @@ def score_chart_view(request):
             'overall_percentage': round(overall_percentage, 1),
         },
         'chart_data': json.dumps(chart_data),
-        'has_data': bool(chart_data),
+        'has_data': True
     }
     return render(request, 'aiquiz/score_chart.html', context)
 
